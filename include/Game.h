@@ -8,8 +8,8 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-#include <string>
 #include <SDL.h>
+#include <string>
 #include <State.h>
 
 class Game {

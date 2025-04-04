@@ -15,16 +15,21 @@ State::State() {
 }
 
 State::~State() {
+	delete bg;
 }
 
 bool State::QuitRequested() {
-	return this->quitRequested;
+	return quitRequested;
 }
 
 void State::Update(float dt) {
-	this->quitRequested = SDL_QuitRequested();
+	quitRequested = SDL_QuitRequested();
 }
 
 void State::Render() {
-	this->bg->Render(0,0);
+	bg->Render(0,0);
+}
+
+void State::LoadAssets() {
+
 }

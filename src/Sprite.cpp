@@ -8,6 +8,7 @@
 #include "Sprite.h"
 #include <SDL_image.h>
 #include <Game.h>
+#include <MessageBox.h>
 #include <iostream>
 
 using std::string;
@@ -31,11 +32,11 @@ void Sprite::Open(string file) {
 	   texture = nullptr;
 	}
 
-	Game game = Game::GetInstance();
-	SDL_Texture* textureLoadResult = IMG_LoadTexture(game.GetRenderer(), file.c_str());
-	if(textureLoadResult == nullptr) {
-		std::cout << "Erro ao carregar textura: " << IMG_GetError();
-		abort();
+	texture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), file.c_str());
+
+	if(texture == nullptr) {
+		string mensagem = string("Erro ao iniciar SDL_Texture: ") + SDL_GetError();
+		MessageBox::ShowError(mensagem);
 	}
 
 	SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
@@ -59,9 +60,8 @@ int Sprite::GetHeight() {
 }
 
 void Sprite::Render(int x, int y) {
-	Game game = Game::GetInstance();
-	SDL_Rect dstRect = { x, y, clipRect.w, clipRect.h };
-	SDL_RenderCopy(game.GetRenderer(), texture, &clipRect, &dstRect);
+	SDL_Rect dstRect = { x, y, GetWidth(), GetHeight()};
+	SDL_RenderCopy(Game::GetInstance().GetRenderer(), texture, &clipRect, &dstRect);
 }
 
 bool Sprite::IsOpen() {

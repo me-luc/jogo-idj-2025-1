@@ -6,6 +6,7 @@
  */
 
 #include "Music.h"
+#include <MessageBox.h>
 #include <iostream>
 
 Music::Music() {
@@ -26,7 +27,8 @@ void Music::Stop(int msToStop) {
 void Music::Open(string file) {
 	Mix_Music* musicLoadResult = Mix_LoadMUS(file.c_str());
 	if (musicLoadResult == nullptr) {
-	        std::cout << "Erro ao carregar música: " << Mix_GetError();
+		string mensagem = string("Erro ao carregar música: ") + Mix_GetError();
+		MessageBox::ShowError(mensagem);
 	}
 }
 
