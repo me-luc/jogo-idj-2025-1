@@ -10,15 +10,17 @@
 #include <Game.h>
 #include <MessageBox.h>
 #include <iostream>
+#include <string>
 
-using std::string;
 
 Sprite::Sprite() {
 	texture = nullptr;
 }
 
-Sprite::Sprite(string file) {
+Sprite::Sprite(std::string file, int frameCountW, int frameCountH) {
 	texture = nullptr;
+	this->frameCountW = frameCountW;
+	this->frameCountH = frameCountH;
 	Open(file);
 }
 
@@ -26,7 +28,7 @@ Sprite::~Sprite() {
 	SDL_DestroyTexture(texture);
 }
 
-void Sprite::Open(string file) {
+void Sprite::Open(std::string file) {
 	if (texture != nullptr) {
 	   SDL_DestroyTexture(texture);
 	   texture = nullptr;
@@ -35,8 +37,10 @@ void Sprite::Open(string file) {
 	texture = IMG_LoadTexture(Game::GetInstance().GetRenderer(), file.c_str());
 
 	if(texture == nullptr) {
-		string mensagem = string("Erro ao iniciar SDL_Texture: ") + SDL_GetError();
-		MessageBox::ShowError(mensagem);
+		std::string mensagem = std::string("Erro ao iniciar SDL_Texture: ") + SDL_GetError();
+		std::cout << "Falha ao carregar: " << file << std::endl;
+	} else {
+		std::cout << "Carregado: " << file << std::endl;
 	}
 
 	SDL_QueryTexture(texture, nullptr, nullptr, &width, &height);
@@ -59,11 +63,29 @@ int Sprite::GetHeight() {
     return height;
 }
 
-void Sprite::Render(int x, int y) {
+void Sprite::Render(int x, int y, int w, int h) {
 	SDL_Rect dstRect = { x, y, GetWidth(), GetHeight()};
 	SDL_RenderCopy(Game::GetInstance().GetRenderer(), texture, &clipRect, &dstRect);
 }
 
 bool Sprite::IsOpen() {
 	return texture != nullptr;
+}
+
+void Sprite::SetFrame(int frame) {
+	int frameWidth = width / frameCountW;
+	int frameHeight = height / frameCountH;
+
+	int row = frame / frameCountW;
+	int col = frame % frameCountW;
+
+	int x = col * frameWidth;
+	int y = row * frameHeight;
+
+	SetClip(x, y, frameWidth, frameHeight);
+}
+
+void Sprite::SetFrameCount(int frameCountW, int frameCountH) {
+	this->frameCountW = frameCountW;
+	this->frameCountH = frameCountH;
 }

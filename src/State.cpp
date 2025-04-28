@@ -7,15 +7,26 @@
 
 #include "State.h"
 #include <Sprite.h>
+#include <SpriteRenderer.h>
+#include <Zombie.h>
 
 State::State() {
 	quitRequested = false;
-	string filePath = "Recursos/img/Background.png";
-	bg = new Sprite(filePath);
+
+	GameObject* bgObject = new GameObject();
+	SpriteRenderer* bgSprite = new SpriteRenderer(*bgObject, "Recursos/img/Background.png");
+	bgObject->AddComponent(bgSprite);
+	AddObject(bgObject);
+
+	GameObject* zombieObject = new GameObject();
+	zombieObject->AddComponent(new Zombie(*zombieObject));
+	zombieObject->box.x = 600;
+	zombieObject->box.y = 450;
+	AddObject(zombieObject);
 }
 
 State::~State() {
-	delete bg;
+	objectArray.clear();
 }
 
 bool State::QuitRequested() {
@@ -24,12 +35,27 @@ bool State::QuitRequested() {
 
 void State::Update(float dt) {
 	quitRequested = SDL_QuitRequested();
+
+	for(int i =  0; i < objectArray.size(); i++) {
+		objectArray[i]->Update(dt);
+	}
+
+	for(int i =  0; i < objectArray.size(); i++) {
+		if(objectArray[i]->IsDead()) {
+			objectArray.erase(objectArray.begin() + i);
+		}
+	}
 }
 
 void State::Render() {
-	bg->Render(0,0);
+	for(int i =  0; i < objectArray.size(); i++) {
+		objectArray[i]->Render();
+	}
 }
 
+void State::AddObject(GameObject* go) {
+	objectArray.emplace_back(go);
+}
 void State::LoadAssets() {
 
 }
